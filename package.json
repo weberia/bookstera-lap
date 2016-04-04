@@ -1,17 +1,37 @@
 {
-  "name": "speax",
-  "version": "0.9.1",
-  "description": "A Hapi plugin for speech act based conversation - server side",
-  "author": "bpdp",
-  "license": "MIT",
-  "main": "lib/index.js",
-  "repository": "http://github.com/weberia/weberia/speax",
+  "name": "Bookstera",
+  "version": "1.0.0",
+  "description": "A showcase of pragmatic web systems",
+  "main": "server.js",
   "scripts": {
     "test": "mocha spec"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/weberia/bookstera-new.git"
+  },
+  "keywords": [
+    "syntactic",
+    "semantic",
+    "pragmatic",
+    "web",
+    "agent",
+    "interaction",
+    "communication"
+  ],
+  "author": "Bambang Purnomosidi D. P.",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/weberia/bookstera-new/issues"
+  },
+  "homepage": "https://github.com/weberia/bookstera-new#readme",
   "dependencies": {
     "hapi": "*",
-    "hapi-auth-cookie": "*",
-    "joi": "*"
+    "inert": "*",
+    "rethinkdb": "*",
+    "vision": "*",
+    "jsonld": "*",
+    "handlebars": "*",
+    "hapi-auth-cookie": "*"
   }
 }
