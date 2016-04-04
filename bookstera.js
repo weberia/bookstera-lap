@@ -114,6 +114,24 @@ const discourses = function (request, reply) {
 
 };
 
+const speax = function (request, reply) {
+
+      reply('a:' + request.params);
+
+};
+
+const resourcesjson = function (request, reply) {
+
+  r.db('bookstera').table('resources').run(cn, function(err, result) {
+    if (err) {
+      reply('error');
+    } else {
+      reply(result.toArray());
+    }
+  })
+
+};
+
 const login = function (request, reply) {
 
     if (request.auth.isAuthenticated) {
@@ -213,14 +231,14 @@ server.register(require('hapi-auth-cookie'), (err) => {
           method: ['GET', 'POST'], 
           path: '/login', 
           config: { 
-            handler: login, auth: 
-              { mode: 'try' }, 
-              plugins: { 
-                'hapi-auth-cookie': 
-                  { 
-                    redirectTo: false 
-                  } 
-              } 
+            handler: login, 
+            auth: { mode: 'try' }, 
+            plugins: { 
+              'hapi-auth-cookie': 
+                { 
+                  redirectTo: false 
+                } 
+            } 
           } 
         },
         { 
@@ -258,6 +276,22 @@ server.register(require('hapi-auth-cookie'), (err) => {
             handler: discourses
           }
         },
+        {
+          method: ['GET', 'POST'],
+          path: '/speax/{param*}',
+          config: {
+            auth: false,
+            handler: speax
+          }
+        },
+        {
+          method: ['GET', 'POST'],
+          path: '/resources.json',
+          config: {
+            auth: false,
+            handler: resourcesjson
+          }
+        }
     ]);
 
     server.start(() => {

@@ -32,6 +32,7 @@
     "vision": "*",
     "jsonld": "*",
     "handlebars": "*",
-    "hapi-auth-cookie": "*"
+    "hapi-auth-cookie": "*",
+    "zax": "file:../ifa/zax"
   }
 }
