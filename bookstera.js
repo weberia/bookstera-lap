@@ -3,6 +3,9 @@
 const Hapi = require('hapi');
 var Path = require('path');
 var Inert = require('inert');
+var Zax = require('zax');
+ 
+const zax = new Zax();
 
 const server = new Hapi.Server();
 server.connection({ port: 8000 });
@@ -116,7 +119,21 @@ const discourses = function (request, reply) {
 
 const speax = function (request, reply) {
 
-      reply('a:' + request.params);
+  var query = request.params.param;
+
+  var qReceived = zax.query(query);
+
+  switch (qReceived.force) {
+    case 'request':
+      reply('{"req": "' + qReceived.directivePropositional + '"}' );
+      break;
+    case 'assert':
+      var p = qReceived.assertivePropositional;
+      reply('{"9781617292019": 100}' );
+      break;
+    default:
+      reply('{"req": "default"}' );
+  }
 
 };
 
