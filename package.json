@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/weberia/bookstera-new#readme",
   "dependencies": {
+    "async": "*",
     "hapi": "*",
     "inert": "*",
     "rethinkdb": "*",

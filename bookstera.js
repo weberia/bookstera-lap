@@ -4,6 +4,7 @@ const Hapi = require('hapi');
 var Path = require('path');
 var Inert = require('inert');
 var Zax = require('zax');
+var async = require('async');
  
 const zax = new Zax();
 
@@ -79,11 +80,61 @@ const home = function (request, reply) {
 
 const goals = function (request, reply) {
 
-    reply.view('index', { 
-      message: 'Msg goals',
-      whoami: request.auth.credentials.name,
-      title: 'Goals and Progress'
-    });
+  const goalsParts = request.params.param.split('/');
+
+  var numArgs = goalsParts.length;
+
+  if (numArgs > 1) {
+    var arg1 =  encodeURIComponent(goalsParts[0]);
+    var arg2 =  encodeURIComponent(goalsParts[1]);
+  } else {
+    var arg1 = request.params.param;
+  }
+
+  var msg = null;
+
+  switch (arg1) {
+    case 'home':
+      /*
+      r.db('bookstera').table('goals').run(cn, function(err, result) {
+        if (err) {
+          msg = 'error';
+        } else {
+          msg = result.toArray();
+        }
+      });
+     */
+
+      r.db('bookstera').table('goals').run(cn).then(function(cursor) {
+        return cursor.toArray()
+      }).then(function(results) {
+        var data = JSON.parse(JSON.stringify(results, null, 2).trim());
+        var msg = '<b>Goals:</b>' + data[0].goals + '<br />' +
+          '<b>Agreement:</b>' + data[0].agreement + '<br />';
+        reply.view('index', { 
+          message: msg,
+          whoami: request.auth.credentials.name,
+          title: 'Goals and Progress'
+        });
+      }).error(function(err) {
+        msg = err;
+      })
+
+      break;
+    case 'edit':
+      msg = 'edit';
+      break;
+    default:
+      msg = 'default';
+  }
+
+  /*
+  reply.view('index', { 
+    message: msg,
+    whoami: request.auth.credentials.name,
+    title: 'Goals and Progress'
+  });
+ */
 
 };
 
@@ -146,6 +197,30 @@ const resourcesjson = function (request, reply) {
       reply(result.toArray());
     }
   })
+
+};
+
+const linkeddata = function (request, reply) {
+
+  const jsonld = request.params.jsonld ? encodeURIComponent(request.params.jsonld) : 'list';
+
+  if (jsonld == 'list') {
+    r.db('bookstera').table('jsonld').run(cn, function(err, result) {
+      if (err) {
+        reply('error');
+      } else {
+        reply(result.toArray());
+      }
+    });
+  } else {
+    r.db('bookstera').table('jsonld').filter(r.row('@type').eq(jsonld)).run(cn, function(err, result) {
+      if (err) {
+        reply('error');
+      } else {
+        reply(result.toArray());
+      }
+    });
+  }
 
 };
 
@@ -267,7 +342,7 @@ server.register(require('hapi-auth-cookie'), (err) => {
         },
         {
           method: 'GET',
-          path: '/goals',
+          path: '/goals/{param*}',
           config: {
             handler: goals
           }
@@ -307,6 +382,14 @@ server.register(require('hapi-auth-cookie'), (err) => {
           config: {
             auth: false,
             handler: resourcesjson
+          }
+        },
+        {
+          method: ['GET', 'POST'],
+          path: '/semantix/{jsonld?}',
+          config: {
+            auth: false,
+            handler: linkeddata
           }
         }
     ]);
