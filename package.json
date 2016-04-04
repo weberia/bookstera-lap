@@ -1,0 +1,17 @@
+{
+  "name": "speax",
+  "version": "0.9.1",
+  "description": "A Hapi plugin for speech act based conversation - server side",
+  "author": "bpdp",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "repository": "http://github.com/weberia/weberia/speax",
+  "scripts": {
+    "test": "mocha spec"
+  },
+  "dependencies": {
+    "hapi": "*",
+    "hapi-auth-cookie": "*",
+    "joi": "*"
+  }
+}
