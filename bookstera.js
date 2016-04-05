@@ -95,22 +95,25 @@ const goals = function (request, reply) {
 
   switch (arg1) {
     case 'home':
-      /*
-      r.db('bookstera').table('goals').run(cn, function(err, result) {
-        if (err) {
-          msg = 'error';
-        } else {
-          msg = result.toArray();
-        }
-      });
-     */
-
       r.db('bookstera').table('goals').run(cn).then(function(cursor) {
         return cursor.toArray()
       }).then(function(results) {
         var data = JSON.parse(JSON.stringify(results, null, 2).trim());
-        var msg = '<b>Goals:</b>' + data[0].goals + '<br />' +
-          '<b>Agreement:</b>' + data[0].agreement + '<br />';
+
+        var sg = '';
+        var numSubGoals = data[0].subgoals.length;
+        for (var i = 0; i < numSubGoals; i++) {
+          sg += i + 1 + '. ' + data[0].subgoals[i].def + ' - ' + data[0].subgoals[i].status  + '<br />';
+        }
+        
+        var msg = '<b>Goals: </b>' + data[0].goals + '<br />' +
+          '<b>Number of subgoals: </b> ' + data[0].subgoals.length + '<br />' +
+          sg +  
+          '<b>Agreement: </b>' + data[0].agreement + '<br />' +
+            '<br />' +
+              '<form action="/goals/edit" method="POST">' + 
+              '<input type="submit" value="Edit">' + 
+              '</form>';
         reply.view('index', { 
           message: msg,
           whoami: request.auth.credentials.name,
@@ -123,48 +126,172 @@ const goals = function (request, reply) {
       break;
     case 'edit':
       msg = 'edit';
+      reply.view('index', { 
+        message: msg,
+        whoami: request.auth.credentials.name,
+        title: 'Goals and Progress'
+      });
       break;
     default:
-      msg = 'default';
+      reply.redirect('/goals/home');
   }
-
-  /*
-  reply.view('index', { 
-    message: msg,
-    whoami: request.auth.credentials.name,
-    title: 'Goals and Progress'
-  });
- */
 
 };
 
 const ontology = function (request, reply) {
 
-    reply.view('index', { 
-      message: 'Msg ontology',
-      whoami: request.auth.credentials.name,
-      title: 'Ontology and Shared Meaning'
-    });
+  const ontParts = request.params.param.split('/');
+
+  var numArgs = ontParts.length;
+
+  if (numArgs > 1) {
+    var arg1 =  encodeURIComponent(ontParts[0]);
+    var arg2 =  encodeURIComponent(ontParts[1]);
+  } else {
+    var arg1 = request.params.param;
+  }
+
+  var msg = null;
+
+  switch (arg1) {
+    case 'home':
+      r.db('bookstera').table('jsonld').run(cn).then(function(cursor) {
+        return cursor.toArray()
+      }).then(function(results) {
+        var data = JSON.parse(JSON.stringify(results, null, 2).trim());
+        var msg = JSON.stringify(data, null, 2).trim();
+
+        var s = '';
+
+        for (var i = 0; i < data.length; i++) {
+          s += i + 1 + '. ' + data[i]["@type"] + '<br />';
+        }
+
+        reply.view('index', { 
+          message: s,
+          whoami: request.auth.credentials.name,
+          title: 'Ontology and Shared Meaning'
+        });
+      }).error(function(err) {
+        msg = err;
+      })
+
+      break;
+    case 'edit':
+      msg = 'edit';
+
+      reply.view('index', { 
+        message: msg,
+        whoami: request.auth.credentials.name,
+        title: 'Ontology and Shared Meaning'
+      });
+      break;
+    default:
+      reply.redirect('/ontology/home');
+  }
 
 };
 
 const notes = function (request, reply) {
 
-    reply.view('index', { 
-      message: 'Msg notes',
-      whoami: request.auth.credentials.name,
-      title: 'Notes'
-    });
+  const notesParts = request.params.param.split('/');
+
+  var numArgs = notesParts.length;
+
+  if (numArgs > 1) {
+    var arg1 =  encodeURIComponent(notesParts[0]);
+    var arg2 =  encodeURIComponent(notesParts[1]);
+  } else {
+    var arg1 = request.params.param;
+  }
+
+  var msg = null;
+
+  switch (arg1) {
+    case 'home':
+      r.db('bookstera').table('notes').run(cn).then(function(cursor) {
+        return cursor.toArray()
+      }).then(function(results) {
+        var data = JSON.parse(JSON.stringify(results, null, 2).trim());
+        msg = JSON.stringify(data);
+
+        var s = '';
+
+        for (var i = 0; i < data.length; i++) {
+          s += i + 1 + '. ' + data[i].title + '<br />';
+        }
+
+        reply.view('index', { 
+          message: s,
+          whoami: request.auth.credentials.name,
+          title: 'Notes'
+        });
+      }).error(function(err) {
+        msg = err;
+      })
+
+      break;
+    case 'edit':
+      msg = 'edit';
+      reply.view('index', { 
+        message: msg,
+        whoami: request.auth.credentials.name,
+        title: 'Notes'
+      });
+      break;
+    default:
+      reply.redirect('/notes/home');
+  }
 
 };
 
 const discourses = function (request, reply) {
 
-    reply.view('index', { 
-      message: 'Msg discourses',
-      whoami: request.auth.credentials.name,
-      title: 'Discourses'
-    });
+  const dscParts = request.params.param.split('/');
+
+  var numArgs = dscParts.length;
+
+  if (numArgs > 1) {
+    var arg1 =  encodeURIComponent(dscParts[0]);
+    var arg2 =  encodeURIComponent(dscParts[1]);
+  } else {
+    var arg1 = request.params.param;
+  }
+
+  var msg = null;
+
+  switch (arg1) {
+    case 'home':
+      r.db('bookstera').table('discourses').run(cn).then(function(cursor) {
+        return cursor.toArray()
+      }).then(function(results) {
+        var data = JSON.parse(JSON.stringify(results, null, 2).trim());
+        if (data.length < 1) {
+          msg = 'No discourses data'
+        } else {
+          msg = 'There are ' + data/length + ' discourses'
+        }
+        reply.view('index', { 
+          message: msg,
+          whoami: request.auth.credentials.name,
+          title: 'Discourses'
+        });
+      }).error(function(err) {
+        msg = err;
+      })
+
+      break;
+    case 'edit':
+      msg = 'edit';
+      reply.view('index', { 
+        message: msg,
+        whoami: request.auth.credentials.name,
+        title: 'Discourses'
+      });
+      break;
+    default:
+      reply.redirect('/discourses/home');
+  }
 
 };
 
@@ -349,21 +476,21 @@ server.register(require('hapi-auth-cookie'), (err) => {
         },
         {
           method: 'GET',
-          path: '/ontology',
+          path: '/ontology/{param*}',
           config: {
             handler: ontology
           }
         },
         {
           method: 'GET',
-          path: '/notes',
+          path: '/notes/{param*}',
           config: {
             handler: notes
           }
         },
         {
           method: 'GET',
-          path: '/discourses',
+          path: '/discourses/{param*}',
           config: {
             handler: discourses
           }
